@@ -33,7 +33,7 @@ print("=== CREANDO OBJETOS ===")
 Empleado1 = Empleado(1,"Alba Motacilla","Desarrolladora",45000)
 
 # 4. Crear una tarjeta corporativa con id: 1, número: TC001, fecha de emisión: 2025-01-15, id de empleado: 1
-TarjetaCorporativa1 = TarjetaCorporativa(1,"TC001","2025-01-15",1)
+TarjetaCorporativa1 = TarjetaCorporativa(1,"TC001","2025-01-15",Empleado1)
 
 print("=== ESTABLECIENDO RELACIÓN ===")
 

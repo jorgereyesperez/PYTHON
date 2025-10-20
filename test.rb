@@ -39,10 +39,10 @@ RUTA_1 = [
 ]
 
 RUTA_2 = [
-  Pokemon.new("Lotad", "Rain Dish", "Own Tempo", ["Synthesis", "Razor Leaf", "Water Gun"], 6, 10),
-  Pokemon.new("Seedot", "Chlorophyll", "Pickpocket", ["Leech Seed", "Defog", "Night Slash"], 6, 10),
-  Pokemon.new("Ralts", "Synchronize", "Telepathy", ["Knock Off", "Destiny Bond", "Mystical Fire"], 6, 10),
-  Pokemon.new("Surskit", "Swift Swim", "Rain Dish", ["Bug Bite", "Hydro Pump", "Aqua Jet"], 6, 10)
+  Pokemon.new("Lotad", "Rain Dish", "Own Tempo", ["Synthesis", "Razor Leaf", "Water Gun"], 9, 12),
+  Pokemon.new("Seedot", "Chlorophyll", "Pickpocket", ["Leech Seed", "Defog", "Night Slash"], 9, 12),
+  Pokemon.new("Ralts", "Synchronize", "Telepathy", ["Knock Off", "Destiny Bond", "Mystical Fire"], 9, 12),
+  Pokemon.new("Surskit", "Swift Swim", "Rain Dish", ["Bug Bite", "Hydro Pump", "Aqua Jet"], 9, 12)
 ]
 
 def mostrar_pokemon_salvaje(localizacion)
