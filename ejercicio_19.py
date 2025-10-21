@@ -45,10 +45,11 @@ print("=== ESTABLECIENDO RELACIÓN ===")
 Archivo1.carpeta = Carpeta1
 Archivo2.carpeta = Carpeta1
 Archivo3.carpeta = Carpeta1
+Carpeta1.archivos.extend([Archivo1, Archivo2, Archivo3])
 
-Carpeta1.archivos.append(Archivo1)
-Carpeta1.archivos.append(Archivo2)
-Carpeta1.archivos.append(Archivo3)
+#Carpeta1.archivos.append(Archivo1)
+#Carpeta1.archivos.append(Archivo2)
+#Carpeta1.archivos.append(Archivo3)
 
 print("=== VERIFICANDO RELACIÓN ===")
 

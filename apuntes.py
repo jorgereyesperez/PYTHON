@@ -1,13 +1,58 @@
 import random
 
+NATURALEZAS = {
+    "Hardy":   (None, None),  # neutral
+    "Lonely": ("Ataque", "Defensa"),
+    "Brave":  ("Ataque", "Velocidad"),
+    "Adamant":("Ataque", "Ataque Especial"),
+    "Naughty":("Ataque", "Defensa Especial"),
+    
+    "Bold":   ("Defensa", "Ataque"),
+    "Docile": (None, None),
+    "Relaxed":("Defensa", "Velocidad"),
+    "Impish":("Defensa", "Ataque Especial"),
+    "Lax":    ("Defensa", "Defensa Especial"),
+    
+    "Timid":  ("Velocidad", "Ataque"),
+    "Hasty":  ("Velocidad", "Defensa"),
+    "Serious":(None, None),
+    "Jolly":  ("Velocidad", "Ataque Especial"),
+    "Naive":  ("Velocidad", "Defensa Especial"),
+    
+    "Modest": ("Ataque Especial", "Ataque"),
+    "Mild":   ("Ataque Especial", "Defensa"),
+    "Quiet":  ("Ataque Especial", "Velocidad"),
+    "Bashful":(None, None),
+    "Rash":   ("Ataque Especial", "Defensa Especial"),
+    
+    "Calm":   ("Defensa Especial", "Ataque"),
+    "Gentle": ("Defensa Especial", "Defensa"),
+    "Sassy":  ("Defensa Especial", "Velocidad"),
+    "Careful":("Defensa Especial", "Ataque Especial"),
+    "Quirky": (None, None)
+}
+
 class Pokemon:
-    def __init__(self, nombre, habilidad, habilidad_oculta, egg_moves, nivel_min, nivel_max):
+    def __init__(self, nombre, habilidad, habilidad_oculta, egg_moves, nivel_min, nivel_max,
+                 hp_base, atk_base, def_base, sp_atk_base, sp_def_base, velocidad_base):
         self.nombre = nombre
         self.habilidad = habilidad
         self.habilidad_oculta = habilidad_oculta
         self.egg_moves = egg_moves
         self.nivel_min = nivel_min
         self.nivel_max = nivel_max
+
+        self.stats_base = {
+            "HP": hp_base,
+            "Ataque": atk_base,
+            "Defensa": def_base,
+            "Ataque Especial": sp_atk_base,
+            "Defensa Especial": sp_def_base,
+            "Velocidad": velocidad_base
+        }
+
+        self.IVs = self.generar_ivs()
+        self.naturaleza = self.obtener_naturaleza()
     
     def obtener_nivel(self):
         return random.randint(self.nivel_min, self.nivel_max)
@@ -23,19 +68,46 @@ class Pokemon:
             return random.choice(self.egg_moves)
         else:
             return "Ninguno"
+    
+    def generar_ivs(self):
+        return {stat: random.randint(0, 31) for stat in self.stats_base}
+
+    def obtener_naturaleza(self):
+        return random.choice(list(NATURALEZAS.keys()))
+
+    def calcular_estadisticas_reales(self, nivel):
+        stats_reales = {}
+        plus_stat, minus_stat = NATURALEZAS[self.naturaleza]
+
+        for stat, base in self.stats_base.items():
+            iv = self.IVs[stat]
+
+            if stat == "HP":
+                real = int(((2 * base + iv) * nivel / 100) + nivel + 10)
+            else:
+                stat_nature = 1.0
+                if stat == plus_stat:
+                    stat_nature = 1.1
+                elif stat == minus_stat:
+                    stat_nature = 0.9
+                real = int((((2 * base + iv) * nivel / 100) + 5) * stat_nature)
+
+            stats_reales[stat] = real
+
+        return stats_reales
 
 # Pokémon en las rutas
 Dexnav_Data = {
     "Ruta 1": [
-        Pokemon("Poochyena", "Run Away", "Rattled", ["Fire Fang", "Ice Fang", "Thunder Fang"], 5, 8),
-        Pokemon("Zigzagoon", "Pickup", "Quick Feet", ["Extreme Speed", "Charm", "Mud-Slap"], 5, 8),
-        Pokemon("Wurmple", "Shield Dust", "", [], 5, 8)
+        Pokemon("Poochyena", "Run Away", "Rattled", ["Fire Fang", "Ice Fang", "Thunder Fang"], 5, 8, 35, 55, 35, 30, 30, 35),
+        Pokemon("Zigzagoon", "Pickup", "Quick Feet", ["Extreme Speed", "Charm", "Mud-Slap"], 5, 8, 38, 30, 41, 30, 41, 60),
+        Pokemon("Wurmple", "Shield Dust", "", [], 5, 8, 45, 45, 35, 20, 30, 20)
     ],
     "Ruta 2": [
-        Pokemon("Lotad", "Rain Dish", "Own Tempo", ["Synthesis", "Razor Leaf", "Water Gun"], 9, 12),
-        Pokemon("Seedot", "Chlorophyll", "Pickpocket", ["Leech Seed", "Defog", "Night Slash"], 9, 12),
-        Pokemon("Ralts", "Synchronize", "Telepathy", ["Knock Off", "Destiny Bond", "Mystical Fire"], 9, 12),
-        Pokemon("Surskit", "Swift Swim", "Rain Dish", ["Bug Bite", "Hydro Pump", "Aqua Jet"], 9, 12)
+        Pokemon("Lotad", "Rain Dish", "Own Tempo", ["Synthesis", "Razor Leaf", "Water Gun"], 9, 12, 40, 30, 30, 40, 50, 30),
+        Pokemon("Seedot", "Chlorophyll", "Pickpocket", ["Leech Seed", "Defog", "Night Slash"], 9, 12, 40, 40, 50, 30, 30, 30),
+        Pokemon("Ralts", "Synchronize", "Telepathy", ["Knock Off", "Destiny Bond", "Mystical Fire"], 9, 12, 28, 25, 25, 45, 35, 40),
+        Pokemon("Surskit", "Swift Swim", "Rain Dish", ["Bug Bite", "Hydro Pump", "Aqua Jet"], 9, 12, 40, 30, 32, 50, 52, 65)
     ]
 }
 
@@ -52,7 +124,15 @@ def mostrar_pokemon_salvaje(localizacion):
 
             print(f"{idx}. {pkmn.nombre} (Nivel {nivel})")
             print(f"   Habilidad: {habilidad} ({tipo_habilidad})")
-            print(f"   Movimiento huevo: {movimiento_huevo}\n")
+            print(f"   Movimiento huevo: {movimiento_huevo}")
+            print(f"   Naturaleza: {pkmn.naturaleza}")
+            print("   IVs:")
+            for stat, iv in pkmn.IVs.items():
+             print(f"     - {stat}: {iv}")
+             print("   Estadísticas reales:")
+            for stat, valor in stats_reales.items():
+             print(f"     - {stat}: {valor}")
+            print()
         
         # Permitir al jugador elegir un Pokémon para enfrentarse
         while True:
