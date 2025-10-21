@@ -63,6 +63,8 @@ print(Carpeta1)
 print(Archivo1)
 print(Archivo2)
 print(Archivo3)
+for archivo in Carpeta1.archivos:
+    print (f"{Archivo.nombre}| {Archivo.extension}|{Archivo.tamaño} bytes")
 
 print("\n=== RESULTADO FINAL ===")
 if Archivo1.carpeta == Carpeta1 and Archivo2.carpeta == Carpeta1 and Archivo3.carpeta == Carpeta1:

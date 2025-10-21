@@ -1,5 +1,7 @@
 import random
 
+Registro_Pokemon = {}
+
 NATURALEZAS = {
     "Hardy":   (None, None),  # neutral
     "Lonely": ("Ataque", "Defensa"),
@@ -41,6 +43,7 @@ class Pokemon:
         self.egg_moves = egg_moves
         self.nivel_min = nivel_min
         self.nivel_max = nivel_max
+        self.es_shiny = False
 
         self.stats_base = {
             "HP": hp_base,
@@ -53,6 +56,9 @@ class Pokemon:
 
         self.IVs = self.generar_ivs()
         self.naturaleza = self.obtener_naturaleza()
+    
+    def determinar_shiny(self):
+        self.es_shiny = random.random() < 1 / 512
     
     def obtener_nivel(self):
         return random.randint(self.nivel_min, self.nivel_max)
@@ -111,6 +117,18 @@ Dexnav_Data = {
     ]
 }
 
+def registrar_pokemon(localizacion, pokemon, habilidad, movimiento_huevo, naturaleza):
+    if localizacion not in Registro_Pokemon:
+        Registro_Pokemon[localizacion] = {}
+
+    if pokemon.nombre not in Registro_Pokemon[localizacion]:
+        Registro_Pokemon[localizacion][pokemon.nombre] = {
+            "Habilidad": habilidad,
+            "Movimiento huevo": movimiento_huevo,
+            "Naturaleza": naturaleza
+        }
+        print(f" {pokemon.nombre} ha sido registrado en la DexNav de {localizacion}.")
+
 def mostrar_pokemon_salvaje(localizacion):
     pokemon_lista = Dexnav_Data.get(localizacion)
     if pokemon_lista:
@@ -118,11 +136,19 @@ def mostrar_pokemon_salvaje(localizacion):
         
         # Mostrar todos los Pokémon disponibles en la ruta
         for idx, pkmn in enumerate(pokemon_lista, 1):
+            pkmn.determinar_shiny()
             nivel = pkmn.obtener_nivel()
             habilidad, tipo_habilidad = pkmn.obtener_habilidad()
             movimiento_huevo = pkmn.obtener_movimiento_huevo()
+            stats_reales = pkmn.calcular_estadisticas_reales(nivel)
+            registrar_pokemon(localizacion, pkmn, habilidad, movimiento_huevo, pkmn.naturaleza)
+            iconos = ""
+            if pkmn.es_shiny:
+             iconos += " ⭐"
+            if tipo_habilidad == "oculta":
+             iconos += " 🕶️"
 
-            print(f"{idx}. {pkmn.nombre} (Nivel {nivel})")
+            print(f"{idx}. {pkmn.nombre}{iconos} (Nivel {nivel})")
             print(f"   Habilidad: {habilidad} ({tipo_habilidad})")
             print(f"   Movimiento huevo: {movimiento_huevo}")
             print(f"   Naturaleza: {pkmn.naturaleza}")
@@ -161,6 +187,19 @@ def mostrar_pokemon_salvaje(localizacion):
     else:
         print(f"\nLa ruta '{localizacion}' no está disponible.")
 
+def mostrar_registro():
+    if not Registro_Pokemon:
+        print("\n📭 No has registrado ningún Pokémon aún.")
+        return
+    print("\n📗 REGISTRO DEXNAV:")
+    for ruta, pokemones in Registro_Pokemon.items():
+        print(f"\n📍 {ruta}:")
+        for nombre, datos in pokemones.items():
+            print(f" - {nombre}")
+            print(f"   Habilidad: {datos['Habilidad']}")
+            print(f"   Movimiento huevo: {datos['Movimiento huevo']}")
+            print(f"   Naturaleza: {datos['Naturaleza']}")
+
 def intentar_captura(pokemon):
     probabilidad_captura = random.random()  # Probabilidad aleatoria entre 0 y 1
     if probabilidad_captura < 0.3:  # 30% de chance de captura
@@ -187,10 +226,19 @@ def explorar_ruta():
         print(f" - {localizacion}")
     
     while True:
-        localizacion_elegida = input("\nEscribe el nombre exacto de la ruta que quieres explorar (o 'salir'): ").strip().title()
+        print("\nOpciones:")
+        print(" - Escribe el nombre exacto de la ruta para explorar.")
+        print(" - Escribe 'registro' para ver tu Pokédex registrada.")
+        print(" - Escribe 'salir' para volver al menú principal.")
+        
+        localizacion_elegida = input("\n ¿Que quieres hacer?: ").strip().title()
         if localizacion_elegida.lower() == "salir":
             print("Volviendo al menú principal.")
             break
+        elif localizacion_elegida.lower() == "registro":
+            mostrar_registro()
+        elif localizacion_elegida in Dexnav_Data:
+            mostrar_pokemon_salvaje(localizacion_elegida)
         if localizacion_elegida not in Dexnav_Data:
             print(f"\nLa ruta '{localizacion_elegida}' no está disponible.")
             continue  # Regresar al inicio del ciclo
